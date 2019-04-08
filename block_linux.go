@@ -254,6 +254,15 @@ release of ghw. Please use the Disk.WWN attribute.
 	return ctx.diskWWN(disk)
 }
 
+func (ctx *context) diskDevNo(disk string) string {
+	devNo, err := ioutil.ReadFile(filepath.Join(ctx.pathSysBlock(), disk, "dev"))
+	if err != nil {
+		return UNKNOWN
+	} else {
+		return string(devNo)
+	}
+}
+
 func (ctx *context) diskWWN(disk string) string {
 	info, err := ctx.udevInfo(disk)
 	if err != nil {
@@ -378,6 +387,7 @@ func (ctx *context) disks() []*Disk {
 		model := ctx.diskModel(dname)
 		serialNo := ctx.diskSerialNumber(dname)
 		wwn := ctx.diskWWN(dname)
+		devNo := ctx.diskDevNo(dname)
 
 		d := &Disk{
 			Name:                   dname,
@@ -392,6 +402,7 @@ func (ctx *context) disks() []*Disk {
 			Model:                  model,
 			SerialNumber:           serialNo,
 			WWN:                    wwn,
+			DevNo:                  devNo,
 		}
 
 		parts := ctx.diskPartitions(dname)
